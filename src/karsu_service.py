@@ -1,7 +1,7 @@
 import json
 
 import requests
-import config
+from src import config
 from datetime import datetime
 
 
