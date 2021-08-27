@@ -40,20 +40,25 @@ def is_off_day():
 
 
 if __name__ == '__main__':
-    if is_off_day():
-        logger.info(f'today: {tehran_now.isoformat()} is off.')
-    else:
-        while True:
-            event = get_event()
-            if event is None:
-                logger.debug(f'it\'s not start or end time ({tehran_now})! sleeping ...')
-                time.sleep(600)
-                continue
 
-            for email, token in config.EMAILS_TOKENS.items():
-                try:
-                    service.submit_datetime(token, event)
-                except ConnectionError:
-                    continue
-                logger.info(f'user with email {email} submitted for {event.lower()} working')
-            time.sleep(3700)
+    while True:
+        utc_now = datetime.utcnow()
+        tehran_now = pytz.timezone('Asia/Tehran').fromutc(utc_now)
+
+        if is_off_day():
+            logger.info(f'today: {tehran_now.isoformat()} is off.')
+            time.sleep(10 * 3600)
+
+        event = get_event()
+        if event is None:
+            logger.debug(f'it\'s not start or end time ({tehran_now})! sleeping ...')
+            time.sleep(600)
+            continue
+
+        for email, token in config.EMAILS_TOKENS.items():
+            try:
+                service.submit_datetime(token, event)
+            except ConnectionError:
+                continue
+            logger.info(f'user with email {email} submitted for {event.lower()} working')
+        time.sleep(3700)
