@@ -16,6 +16,7 @@ from src import config
 from datetime import datetime
 import pytz
 import time
+from src.db import dao
 
 THURSDAY = 4
 FRIDAY = 5
@@ -55,10 +56,10 @@ if __name__ == '__main__':
             time.sleep(600)
             continue
 
-        for email, token in config.EMAILS_TOKENS.items():
+        for token in dao.get_all_tokens():
             try:
-                service.submit_datetime(token, event)
+                service.submit_datetime(token.value, event)
             except ConnectionError:
                 continue
-            logger.info(f'user with email {email} submitted for {event.lower()} working')
+            logger.info(f'user with email {token.email} submitted for {event.lower()} working')
         time.sleep(3700)
