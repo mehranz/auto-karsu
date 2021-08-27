@@ -5,6 +5,8 @@ logging.basicConfig(filename='../submit_logs', filemode='a',
                     datefmt='%H:%M:%S',
                     level=logging.DEBUG)
 
+SQLITE_DB_FILE_EXTENSION = '.db'
+
 KARSU_SUBMIT_ENDPOINT = 'https://panel.karsu.ir/api/InputOutput/add-input-output'
 
 
