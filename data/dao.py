@@ -52,5 +52,11 @@ class DataAccessObject:
             connection.execute(update_query, (token, email))
             return True
 
+    def track_submit(self, token: str):
+        with db.connect(self.db_name) as connection:
+            q = 'UPDATE TOKENS SET last_submitted=? WHERE email=?'
+            connection.execute(q, (datetime.utcnow().isoformat(), token))
+            return True
+
 
 dao = DataAccessObject('tokens')
