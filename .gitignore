@@ -2,3 +2,4 @@ venv/
 submit_logs
 .idea/
 *.db
+.env
