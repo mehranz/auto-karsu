@@ -1,7 +1,7 @@
 import json
 
 import requests
-from src import config
+import config
 from datetime import datetime
 
 
@@ -41,4 +41,3 @@ class KarsuService:
             'Sec-Fetch-Site': 'same-origin',
             'TE': 'trailers'
         }
-
