@@ -11,12 +11,12 @@ deciding that the record should be send for start of day or end of it.
 whenever hour equals to 10 it's an start day event, and 18 is sign of end of the working day.
 """
 
-from src.karsu_service import KarsuService
-from src import config
-from datetime import datetime
+from karsu.karsu_service import KarsuService
+import config
+from datetime import datetime, timedelta
 import pytz
 import time
-from src.db import dao
+from data.dao import dao
 
 THURSDAY = 4
 FRIDAY = 5
@@ -25,13 +25,14 @@ service = KarsuService()
 logger = config.logging.getLogger(__name__)
 
 utc_now = datetime.utcnow()
+tehran_timezone = pytz.timezone('Asia/Tehran')
 tehran_now = pytz.timezone('Asia/Tehran').fromutc(utc_now)
 
 
 def get_event():
-    if tehran_now.hour == 19:
+    if 17 <= tehran_now.hour <= 23:
         return 'END'
-    elif tehran_now.hour == 10:
+    elif 10 <= tehran_now.hour < 17:
         return 'START'
     return None
 
@@ -58,8 +59,22 @@ if __name__ == '__main__':
 
         for token in dao.get_all_tokens():
             try:
+                last_submit = tehran_timezone.fromutc(datetime.fromisoformat(token.last_submit))
+            except TypeError:
+                last_submit = tehran_now - timedelta(days=1)
+
+            if event == 'START' and last_submit.day == tehran_now.day and 10 <= last_submit.hour < 17:
+                logger.info(f'the user {token.email} has submitted start day in: {last_submit}. skipping ...')
+                continue
+
+            if event == 'END' and last_submit.day == tehran_now.day and 17 <= last_submit.hour <= 23:
+                logger.info(f'the user {token.email} has submitted end day in: {last_submit}. skipping ...')
+                continue
+
+            try:
                 service.submit_datetime(token.value, event)
+                dao.track_submit(token)
             except ConnectionError:
                 continue
             logger.info(f'user with email {token.email} submitted for {event.lower()} working')
-        time.sleep(3700)
+        time.sleep(600)
