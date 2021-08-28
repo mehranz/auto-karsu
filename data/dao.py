@@ -1,6 +1,7 @@
+from datetime import datetime
 import sqlite3 as db
-from src import config
-from src.models import Token
+import config
+from data.models import Token
 
 
 class DataAccessObject:
@@ -8,7 +9,7 @@ class DataAccessObject:
     db_name: str
 
     def __init__(self, db_name: str):
-        self.db_name = f'{db_name}{config.SQLITE_DB_FILE_EXTENSION}'
+        self.db_name = f'{config.PROJECT_ROOT}/data/{db_name}{config.SQLITE_DB_FILE_EXTENSION}'
         self.create_tokens_table()
 
     def create_tokens_table(self):
@@ -17,7 +18,8 @@ class DataAccessObject:
             (
                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 email VARCHAR (256) NOT NULL UNIQUE ,
-                token TEXT NOT NULL 
+                token TEXT NOT NULL ,
+                last_submitted DATETIME
             )'''
             connection.execute(table_create_query)
 
