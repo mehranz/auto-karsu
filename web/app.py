@@ -1,8 +1,7 @@
 from flask import Flask, flash, redirect, render_template, \
      request, url_for
-from src.db import dao
-from src import config
-
+from data.dao import dao
+import config
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
