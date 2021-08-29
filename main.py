@@ -71,7 +71,14 @@ if __name__ == '__main__':
                 logger.info(f'the user {token.email} has submitted end day in: {last_submit}. skipping ...')
                 continue
 
+            start = config.START_WORK_TIME.split(':')
+            end = config.END_WORK_TIME.split(':')
+
             try:
+                if (event == 'START' and tehran_now.hour < int(start[0]) and tehran_now.minute < int(start[1])) \
+                        or (event == 'END' and tehran_now.hour >= int(end[0]) and tehran_now.minute >= int(end[1])):
+                    continue
+
                 service.submit_datetime(token.value, event)
                 dao.track_submit(token)
             except ConnectionError:
